@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 app = FastAPI(
     title="RELMUN REX API",
-    version="1.1.0"
+    version="1.0.0"
 )
 
 
@@ -23,7 +23,7 @@ app.add_middleware(
 
 
 # =========================================================
-# REQUEST MODEL
+# MODELS
 # =========================================================
 
 class ChatRequest(BaseModel):
@@ -31,103 +31,100 @@ class ChatRequest(BaseModel):
 
 
 # =========================================================
-# COMMITTEE DATA
+# RELMUN DATA
 # =========================================================
 
-COMMITTEES = {
-    "unsc": {
-        "name": "United Nations Security Council",
-        "short": "UNSC",
-        "description": "International peace and security, diplomacy and high-level decision making."
-    },
-    "unhrc": {
-        "name": "United Nations Human Rights Council",
-        "short": "UNHRC",
-        "description": "Human rights, international cooperation and policy-focused debate."
-    },
-    "unodc": {
-        "name": "United Nations Office on Drugs and Crime",
-        "short": "UNODC",
-        "description": "International cooperation against organised crime, drugs and related challenges."
-    },
-    "aippm": {
-        "name": "All India Political Parties Meet",
-        "short": "AIPPM",
-        "description": "Parliamentary debate, political negotiation and national policy deliberation."
-    },
-    "unw": {
-        "name": "UN Women",
-        "short": "UNW",
-        "description": "Gender equality, empowerment and international policy discussions."
-    },
-    "ipla": {
-        "name": "IPL Auction",
-        "short": "IPLA",
-        "description": "Strategic bidding, team management and high-pressure decision making."
-    }
-}
+REGISTRATION_FEE = "₹200"
+
+CONFERENCE_DATES = "26–27 December 2026"
+
+CONFERENCE_MODE = "Online"
 
 
 # =========================================================
-# RESPONSE FUNCTION
+# REX RESPONSE ENGINE
 # =========================================================
 
 def get_response(question: str) -> str:
 
     q = question.lower().strip()
 
-    # =====================================================
-    # GREETINGS
-    # =====================================================
 
-    greetings = [
-        "hi",
-        "hello",
-        "hey",
-        "yo",
-        "sup",
-        "hiya",
-        "heyy",
-        "heyyy"
-    ]
+    # -----------------------------------------------------
+    # GREETING
+    # -----------------------------------------------------
 
-    if q in greetings or any(q.startswith(word + " ") for word in greetings):
+    if any(
+        q.startswith(word)
+        for word in [
+            "hi",
+            "hello",
+            "hey",
+            "yo",
+            "sup",
+            "hii",
+            "heyy"
+        ]
+    ):
 
         return """Hey! 👋
 
-I'm **REX**, the official **RELMUN '26** assistant.
+I'm **REX**, the official RELMUN '26 assistant.
 
 I can help you with:
 
-- **The conference**
+- **RELMUN '26**
 - **Committees**
 - **The organising team**
+- **Conference details**
 - **Executive Board**
+- **Registration**
 - **MUNFLOW**
 - **Contact information**
 
 What would you like to know?"""
 
 
-    # =====================================================
-    # ABOUT RELMUN
-    # =====================================================
+    # -----------------------------------------------------
+    # REGISTRATION / FEE
+    # -----------------------------------------------------
+
+    if any(
+        word in q
+        for word in [
+            "fee",
+            "fees",
+            "cost",
+            "price",
+            "registration fee",
+            "how much",
+            "register"
+        ]
+    ):
+
+        return f"""## Registration
+
+The **delegate registration fee is {REGISTRATION_FEE}**.
+
+**RELMUN '26** will take place on **{CONFERENCE_DATES}** and will be conducted fully online.
+
+Please check the official registration section for the registration form and opening status."""
+
+
+    # -----------------------------------------------------
+    # ABOUT
+    # -----------------------------------------------------
 
     if (
         "what is relmun" in q
-        or "what's relmun" in q
         or "tell me about relmun" in q
         or "about relmun" in q
-        or "what is relmun 26" in q
-        or "what's relmun 26" in q
-        or "tell me about the conference" in q
-        or "about the conference" in q
-        or "conference details" in q
         or "more info" in q
         or "more information" in q
+        or "what is this" in q
     ):
 
-        return """## RELMUN '26
+        return f"""## RELMUN '26
 
 **RELMUN '26** stands for **Regional Engagement & Leadership Model United Nations**.
 
@@ -135,183 +132,76 @@ It is a **two-day online Model United Nations conference** built around diplomac
 
 ### Conference Details
 
-- **Dates:** 26–27 December 2026
-- **Format:** Online
+- **Dates:** {CONFERENCE_DATES}
+- **Format:** {CONFERENCE_MODE}
 - **Committees:** 6
+- **Delegate Registration:** {REGISTRATION_FEE}
 
 RELMUN brings delegates together for debate, negotiation, collaboration and strategic decision-making."""
 
 
-    # =====================================================
+    # -----------------------------------------------------
     # DATES
-    # =====================================================
+    # -----------------------------------------------------
 
     if (
-        "when is relmun" in q
-        or "when is the conference" in q
-        or "what date is relmun" in q
-        or "date of relmun" in q
-        or "dates of relmun" in q
-        or "date" in q
+        "date" in q
         or "dates" in q
+        or "when is relmun" in q
+        or "when is the conference" in q
     ):
 
-        return """**RELMUN '26** will take place on **26–27 December 2026**.
+        return f"""RELMUN '26 will take place on **{CONFERENCE_DATES}**.
 
 It is a **fully online** conference."""
 
 
-    # =====================================================
-    # ONLINE / VENUE
-    # =====================================================
+    # -----------------------------------------------------
+    # ONLINE
+    # -----------------------------------------------------
 
     if (
         "online" in q
         or "offline" in q
+        or "physical" in q
         or "venue" in q
         or "where is relmun" in q
-        or "where will relmun" in q
-        or "location" in q
     ):
 
-        return """RELMUN '26 is a **fully online conference**.
+        return f"""RELMUN '26 is a **fully online conference**.
 
-The conference will take place on **26–27 December 2026**."""
+The conference will take place on **{CONFERENCE_DATES}**."""
 
 
-    # =====================================================
+    # -----------------------------------------------------
     # MUNFLOW
-    # =====================================================
+    # -----------------------------------------------------
 
     if (
         "munflow" in q
         or "technology partner" in q
         or "platform partner" in q
         or "technology and platform" in q
+        or "tech partner" in q
     ):
 
         return """## MUNFLOW
 
 **MUNFLOW** is the **Technology & Platform Partner** for **RELMUN '26**.
 
-MUNFLOW supports the technology and platform infrastructure for the conference.
+MUNFLOW provides the technology and platform infrastructure supporting the conference.
 
-The official MUNFLOW website link will be added to RELMUN once the link is provided."""
-
-
-    # =====================================================
-    # COMMITTEE — INDIVIDUAL
-    # =====================================================
-
-    # UNSC
-    if (
-        "unsc" in q
-        or "security council" in q
-        or "united nations security council" in q
-    ):
-
-        return """## UNSC
-
-**United Nations Security Council**
-
-International peace and security, diplomacy and high-level decision making.
-
-**Committee:** UNSC"""
+The official MUNFLOW website link will be added once it is provided to the RELMUN team."""
 
 
-    # UNHRC
-    if (
-        "unhrc" in q
-        or "human rights council" in q
-        or "united nations human rights council" in q
-    ):
-
-        return """## UNHRC
-
-**United Nations Human Rights Council**
-
-Human rights, international cooperation and policy-focused debate.
-
-**Committee:** UNHRC"""
-
-
-    # UNODC
-    if (
-        "unodc" in q
-        or "drugs and crime" in q
-        or "drugs & crime" in q
-        or "office on drugs" in q
-    ):
-
-        return """## UNODC
-
-**United Nations Office on Drugs and Crime**
-
-International cooperation against organised crime, drugs and related challenges.
-
-**Committee:** UNODC"""
-
-
-    # AIPPM
-    if (
-        "aippm" in q
-        or "all india political parties" in q
-        or "political parties" in q
-    ):
-
-        return """## AIPPM
-
-**All India Political Parties Meet**
-
-Parliamentary debate, political negotiation and national policy deliberation.
-
-**Committee:** AIPPM"""
-
-
-    # UNW
-    if (
-        q == "unw"
-        or "un women" in q
-        or "unwomen" in q
-        or "women committee" in q
-    ):
-
-        return """## UN Women
-
-**UN Women**
-
-Gender equality, empowerment and international policy discussions.
-
-**Committee:** UNW"""
-
-
-    # IPLA
-    if (
-        "ipla" in q
-        or "ipl auction" in q
-        or "ipl auction committee" in q
-    ):
-
-        return """## IPLA
-
-**IPL Auction**
-
-Strategic bidding, team management and high-pressure decision making.
-
-**Committee:** IPLA"""
-
-
-    # =====================================================
-    # ALL COMMITTEES
-    # =====================================================
+    # -----------------------------------------------------
+    # COMMITTEES
+    # -----------------------------------------------------
 
     if (
         "committee" in q
         or "committees" in q
         or "rooms" in q
-        or "what are the committees" in q
-        or "list the committees" in q
-        or "which committees" in q
     ):
 
         return """## RELMUN '26 Committees
@@ -330,70 +220,76 @@ United Nations Office on Drugs and Crime — international cooperation against o
 **04 · AIPPM**  
 All India Political Parties Meet — parliamentary debate, political negotiation and national policy deliberation.
 
-**05 · UNW**  
+**05 · UN Women**  
 UN Women — gender equality, empowerment and international policy discussions.
 
 **06 · IPLA**  
 IPL Auction — strategic bidding, team management and high-pressure decision making."""
 
 
-    # =====================================================
-    # CORE TEAM
-    # =====================================================
+    # -----------------------------------------------------
+    # SPECIFIC COMMITTEES
+    # -----------------------------------------------------
 
-    if (
-        "core team" in q
-        or "who is in core" in q
-        or "core members" in q
-        or q == "core"
-    ):
+    committee_data = {
 
-        return """## RELMUN '26 — Core
+        "unsc": (
+            "United Nations Security Council",
+            "International peace and security, diplomacy and high-level decision making."
+        ),
 
-The **Core** organising team consists of:
+        "unhrc": (
+            "United Nations Human Rights Council",
+            "Human rights, international cooperation and policy-focused debate."
+        ),
 
-- **Akshith Kabilan** — Secretary-General
-- **S. Shreyaas** — Deputy Secretary-General
-- **Laasya Vikram** — Director-General
-- **Aashi Kushwaha** — Chief Advisor
+        "unodc": (
+            "United Nations Office on Drugs and Crime",
+            "International cooperation against organised crime, drugs and related challenges."
+        ),
 
-The Core team leads the overall organisation and direction of RELMUN '26."""
+        "aippm": (
+            "All India Political Parties Meet",
+            "Parliamentary debate, political negotiation and national policy deliberation."
+        ),
 
+        "unw": (
+            "UN Women",
+            "Gender equality, empowerment and international policy discussions."
+        ),
 
-    # =====================================================
-    # SECRETARIAT
-    # =====================================================
+        "ipla": (
+            "IPL Auction",
+            "Strategic bidding, team management and high-pressure decision making."
+        )
 
-    if (
-        "secretariat" in q
-        or "secretariat team" in q
-        or "who is in the secretariat" in q
-        or "secretariat members" in q
-    ):
-
-        return """## RELMUN '26 — Secretariat
-
-The **Secretariat** consists of:
-
-- **Abimayur R** — Head of Administration & Outreach
-- **Madhav Bhardwaj** — USG · Delegate Affairs
-
-The Secretariat supports the operational and administrative side of RELMUN '26."""
+    }
 
 
-    # =====================================================
-    # COMPLETE TEAM
-    # =====================================================
+    for code, data in committee_data.items():
+
+        if code in q:
+
+            full_name, description = data
+
+            return f"""## {code.upper()}
+
+**{full_name}**
+
+{description}
+
+You can find the detailed mandate, format and focus of this committee on the RELMUN '26 Committees page."""
+
+
+    # -----------------------------------------------------
+    # TEAM
+    # -----------------------------------------------------
 
     if (
         "team" in q
-        or "organising team" in q
-        or "organizing team" in q
-        or "organising committee" in q
-        or "organizing committee" in q
-        or "who runs relmun" in q
-        or "who organises relmun" in q
-        or "who organizes relmun" in q
+        or "organising" in q
+        or "organizing" in q
+        or "secretariat" in q
     ):
 
         return """## RELMUN '26 Organising Team
@@ -411,13 +307,12 @@ The Secretariat supports the operational and administrative side of RELMUN '26."
 - **Madhav Bhardwaj** — USG · Delegate Affairs"""
 
 
-    # =====================================================
-    # SECRETARY-GENERAL
-    # =====================================================
+    # -----------------------------------------------------
+    # SECRETARY GENERAL
+    # -----------------------------------------------------
 
     if (
         "secretary general" in q
-        or "secretary-general" in q
         or "sec gen" in q
         or "sec-gen" in q
     ):
@@ -427,80 +322,12 @@ The Secretariat supports the operational and administrative side of RELMUN '26."
 The Secretary-General is part of the **Core** organising team."""
 
 
-    # =====================================================
-    # DEPUTY SECRETARY-GENERAL
-    # =====================================================
-
-    if (
-        "deputy secretary general" in q
-        or "deputy secretary-general" in q
-        or "dsg" in q
-    ):
-
-        return """The **Deputy Secretary-General of RELMUN '26 is S. Shreyaas**.
-
-The Deputy Secretary-General is part of the **Core** organising team."""
-
-
-    # =====================================================
-    # DIRECTOR-GENERAL
-    # =====================================================
-
-    if (
-        "director general" in q
-        or "director-general" in q
-        or "dg" in q
-    ):
-
-        return """The **Director-General of RELMUN '26 is Laasya Vikram**.
-
-The Director-General is part of the **Core** organising team."""
-
-
-    # =====================================================
-    # CHIEF ADVISOR
-    # =====================================================
-
-    if (
-        "chief advisor" in q
-        or "chief adviser" in q
-    ):
-
-        return """The **Chief Advisor of RELMUN '26 is Aashi Kushwaha**.
-
-The Chief Advisor is part of the **Core** organising team."""
-
-
-    # =====================================================
-    # ABIMAYUR
-    # =====================================================
-
-    if "abimayur" in q:
-
-        return """**Abimayur R** is the **Head of Administration & Outreach** for RELMUN '26.
-
-Abimayur is part of the **Secretariat**."""
-
-
-    # =====================================================
-    # MADHAV
-    # =====================================================
-
-    if "madhav" in q:
-
-        return """**Madhav Bhardwaj** is the **USG · Delegate Affairs** for RELMUN '26.
-
-Madhav is part of the **Secretariat**."""
-
-
-    # =====================================================
+    # -----------------------------------------------------
     # EXECUTIVE BOARD
-    # =====================================================
+    # -----------------------------------------------------
 
     if (
         "executive board" in q
-        or "executive board members" in q
-        or "eb members" in q
         or q == "eb"
         or "chair" in q
         or "chairs" in q
@@ -508,24 +335,24 @@ Madhav is part of the **Secretariat**."""
 
         return """## Executive Board
 
-The **Executive Board** is responsible for guiding debate and maintaining committee procedure.
+The **Executive Board** will be responsible for guiding debate and maintaining committee procedure.
 
 The EB lineup for the six committees is currently being finalised.
 
 You can check the official **EB** page for updates."""
 
 
-    # =====================================================
+    # -----------------------------------------------------
     # CONTACT
-    # =====================================================
+    # -----------------------------------------------------
 
     if (
         "contact" in q
         or "email" in q
+        or "mail" in q
         or "instagram" in q
-        or "reach relmun" in q
-        or "contact relmun" in q
-        or "how can i contact" in q
+        or "reach" in q
+        or "phone" in q
     ):
 
         return """## Contact RELMUN
@@ -539,15 +366,14 @@ relmun.official@gmail.com
 For official conference updates and announcements, follow **@relmun.official** on Instagram."""
 
 
-    # =====================================================
+    # -----------------------------------------------------
     # THANKS
-    # =====================================================
+    # -----------------------------------------------------
 
     if (
         "thank you" in q
-        or "thanks" in q
+        or q == "thanks"
         or q == "thank"
-        or "thx" in q
     ):
 
         return """You're welcome! 😎
@@ -555,29 +381,28 @@ For official conference updates and announcements, follow **@relmun.official** o
 If you have anything else about **RELMUN '26**, just ask."""
 
 
-    # =====================================================
+    # -----------------------------------------------------
     # DEFAULT
-    # =====================================================
+    # -----------------------------------------------------
 
     return """I can help you with **RELMUN '26**.
 
 Try asking:
 
-- **"Tell me about RELMUN."**
+- **"Tell me more about the conference."**
 - **"What committees are there?"**
-- **"Tell me about UNSC."**
 - **"Who is the Secretary-General?"**
-- **"Who is in the Core?"**
-- **"Who is in the Secretariat?"**
+- **"What is the registration fee?"**
+- **"Tell me about the organising team."**
 - **"Who is MUNFLOW?"**
-- **"Who is on the Executive Board?"**
+- **"What is UNSC?"**
 - **"How can I contact RELMUN?"**
 
-Ask away — I'm **REX**. 🤖"""
+Ask away — I'm REX."""
 
 
 # =========================================================
-# API ROUTES
+# ROOT
 # =========================================================
 
 @app.get("/")
@@ -585,13 +410,20 @@ def root():
 
     return {
         "status": "online",
-        "service": "RELMUN REX API"
+        "service": "RELMUN REX API",
+        "version": "1.0.0"
     }
 
+
+# =========================================================
+# CHAT
+# =========================================================
 
 @app.post("/chat")
 def chat(request: ChatRequest):
 
     return {
-        "reply": get_response(request.message)
+        "reply": get_response(
+            request.message
+        )
     }
